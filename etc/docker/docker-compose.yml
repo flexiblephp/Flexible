@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+
+  flexible.unit-tests:
+    build:
+      context: ./../../
+      dockerfile: ./etc/docker/app.Dockerfile
+    container_name: flexible.unit-tests
+    restart: always
+    tty: true
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+      XDEBUG_MODE: coverage
+    working_dir: /var/www
+    volumes:
+      - ./../../:/var/www
+      - ./../../etc/docker/config/php/local.ini:/usr/local/etc/php/conf.d/local.ini
