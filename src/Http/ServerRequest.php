@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flexible;
+namespace Flexible\Http;
 
 use Nyholm\Psr7\ServerRequest as NyholmServerRequest;
 use Psr\Http\Message\ServerRequestInterface;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flexible;
+namespace Flexible\Http;
 
 use Laminas\Diactoros\ServerRequestFactory as LaminasServerRequestFactory;
 use Psr\Http\Message\ServerRequestFactoryInterface;

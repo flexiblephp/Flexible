@@ -4,7 +4,16 @@ declare(strict_types=1);
 
 namespace Flexible;
 
+use Flexible\Container\Container;
+use Flexible\Container\ContainerInterface;
+use Flexible\Event\EventDispatcher;
+use Flexible\Event\FlexibleHasTerminated;
+use Flexible\Http\ResponseFactory;
+use Flexible\Http\ResponseFactoryInterface;
+use Flexible\Router\Router;
+use Flexible\Router\RouterInterface;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -14,29 +23,38 @@ class App implements RequestHandlerInterface
     private function __construct(
         private ContainerInterface $container,
         private RouterInterface $router,
-        private ResponseFactoryInterface $responseFactory
+        private ResponseFactoryInterface $responseFactory,
+        private EventDispatcherInterface $eventDispatcher
     ) {
     }
 
     public static function create(
         ?ContainerInterface $container = null,
         ?RouterInterface $router = null,
-        ?ResponseFactoryInterface $responseFactory = null
+        ?ResponseFactoryInterface $responseFactory = null,
+        ?EventDispatcherInterface $eventDispatcher = null
     ): self {
         $container = $container ?? new Container();
         $router = $router ?? new Router($container);
         $responseFactory = $responseFactory ?? new ResponseFactory();
+        $eventDispatcher = $eventDispatcher ?? new EventDispatcher();
 
         return new self(
             $container,
             $router,
-            $responseFactory
+            $responseFactory,
+            $eventDispatcher
         );
     }
 
     public function container(): ContainerInterface
     {
         return $this->container;
+    }
+
+    public function eventDispatcher(): EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
     }
 
     public function router(): RouterInterface
@@ -46,7 +64,7 @@ class App implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $response = $this->router->handle($request); // resolvers to handler using congainer, applies middlewares...
+        $response = $this->router->handle($request);
 
         /**
          * This is to be in compliance with RFC 2616, Section 9.
@@ -69,6 +87,6 @@ class App implements RequestHandlerInterface
     {
         (new SapiEmitter())->emit($response);
 
-        // $this->eventDispatcher()->dispatch(new FlexibleHasTerminated()); // TODO FW events
+        $this->eventDispatcher->dispatch(new FlexibleHasTerminated());
     }
 }

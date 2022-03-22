@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Flexible\App;
-use Flexible\ContainerInterface;
+use Flexible\Container\ContainerInterface;
 use PHPUnit\Framework\TestCase;
 
 class AppTest extends TestCase

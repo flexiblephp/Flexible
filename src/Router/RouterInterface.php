@@ -1,6 +1,6 @@
 <?php
 
-namespace Flexible;
+namespace Flexible\Router;
 
 use Psr\Http\Server\RequestHandlerInterface;
 

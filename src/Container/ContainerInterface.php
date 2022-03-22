@@ -1,6 +1,6 @@
 <?php
 
-namespace Flexible;
+namespace Flexible\Container;
 
 use Psr\Container\ContainerInterface as PsrContainerInterface;
 

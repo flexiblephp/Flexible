@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Flexible;
+namespace Flexible\Router;
 
+use Flexible\Container\ContainerInterface;
 use League\Route\Router as LeagueRouter;
 use League\Route\Strategy\ApplicationStrategy;
 use League\Route\Strategy\StrategyAwareInterface;
+use League\Route\Strategy\StrategyInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -16,10 +18,9 @@ class Router implements RouterInterface
 
     public function __construct(ContainerInterface $container)
     {
+        /** @var StrategyInterface $strategy */
         $strategy = (new ApplicationStrategy)->setContainer($container);
-        $router = (new LeagueRouter)->setStrategy($strategy);
-
-        $this->router = $router;
+        $this->router = (new LeagueRouter)->setStrategy($strategy);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -43,7 +44,9 @@ class Router implements RouterInterface
 
     public function head(string $path, $handler): RouteInterface
     {
-        // TODO: Implement head() method.
+        $route = $this->router->head($path, $handler);
+
+        return new Route($route);
     }
 
     public function map(string $method, string $path, $handler): RouteInterface
