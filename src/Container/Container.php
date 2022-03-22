@@ -56,4 +56,20 @@ class Container implements ContainerInterface
     {
         $this->container->addShared($abstraction, $implementation);
     }
+
+    public function addServiceProvider(string $serviceProvider): void
+    {
+        // if () check if valid class
+        $sp = (new ($serviceProvider)());
+
+        $sp->container($this);
+
+//        if (!$sp instanceof ServiceProviderInterface::class) {
+//            throw new \Exception('error');
+//        }
+
+        $this->container->addServiceProvider(
+            $sp
+        );
+    }
 }
