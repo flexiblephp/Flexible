@@ -118,22 +118,11 @@ class SapiEmitter
 
     private function headersSent(?string &$filename = null, ?int &$line = null): bool
     {
-        if (function_exists('Laminas\HttpHandlerRunner\Emitter\headers_sent')) {
-            // phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
-            return \Laminas\HttpHandlerRunner\Emitter\headers_sent($filename, $line);
-        }
-
         return headers_sent($filename, $line);
     }
 
     private function header(string $headerName, bool $replace, int $statusCode): void
     {
-        if (function_exists('Laminas\HttpHandlerRunner\Emitter\header')) {
-            // phpcs:ignore SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName
-            \Laminas\HttpHandlerRunner\Emitter\header($headerName, $replace, $statusCode);
-            return;
-        }
-
         header($headerName, $replace, $statusCode);
     }
 }

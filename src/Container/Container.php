@@ -72,4 +72,11 @@ class Container implements ContainerInterface
             $sp
         );
     }
+
+    public function bindings(array $bindings = []): void
+    {
+        foreach ($bindings as $abstraction => $implementation) {
+            $this->bind($abstraction, $implementation);
+        }
+    }
 }

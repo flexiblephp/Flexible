@@ -42,6 +42,11 @@ class Router implements RouterInterface
         return new Route($route);
     }
 
+    public function group(array $routes): RouteGroup
+    {
+
+    }
+
     public function head(string $path, $handler): RouteInterface
     {
         $route = $this->router->head($path, $handler);

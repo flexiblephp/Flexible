@@ -11,4 +11,6 @@ interface ContainerInterface extends PsrContainerInterface
     public function singleton(string $abstraction, string $implementation): void;
 
     public function addServiceProvider(string $serviceProvider): void;
+
+    public function bindings(array $bindings = []): void;
 }

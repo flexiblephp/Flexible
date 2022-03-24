@@ -21,11 +21,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 class App implements RequestHandlerInterface
 {
     public const VERSION = 'dev';
+    private ResponseFactoryInterface $responseFactory;
 
     private function __construct(
         private ContainerInterface $container,
         private RouterInterface $router,
-        private ResponseFactoryInterface $responseFactory,
+       // ,
         private EventDispatcherInterface $eventDispatcher
     ) {
     }
@@ -33,18 +34,18 @@ class App implements RequestHandlerInterface
     public static function create(
         ?ContainerInterface $container = null,
         ?RouterInterface $router = null,
-        ?ResponseFactoryInterface $responseFactory = null,
+        //?ResponseFactoryInterface $responseFactory = null,
         ?EventDispatcherInterface $eventDispatcher = null
     ): self {
         $container = $container ?? new Container();
         $router = $router ?? new Router($container);
-        $responseFactory = $responseFactory ?? new ResponseFactory();
+        //$responseFactory = $responseFactory ?? new ResponseFactory();
         $eventDispatcher = $eventDispatcher ?? new EventDispatcher();
 
         return new self(
             $container,
             $router,
-            $responseFactory,
+            //$responseFactory,
             $eventDispatcher
         );
     }
@@ -64,6 +65,11 @@ class App implements RequestHandlerInterface
         return $this->router;
     }
 
+    public function responseFactory(): \Psr\Http\Message\ResponseFactoryInterface
+    {
+        return $this->responseFactory ?? $this->container->get(\Psr\Http\Message\ResponseFactoryInterface::class);
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // try {
@@ -81,7 +87,7 @@ class App implements RequestHandlerInterface
          */
         $method = strtoupper($request->getMethod());
         if ('HEAD' === $method) {
-            $emptyBody = $this->responseFactory->createResponse()->getBody();
+            $emptyBody = $this->responseFactory()->createResponse()->getBody();
 
             return $response->withBody($emptyBody);
         }
