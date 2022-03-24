@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Catch exceptions using handler
 - Container contextual binding
 - Container automatic binding
 - Container Service providers

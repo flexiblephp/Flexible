@@ -13,7 +13,6 @@
     "php": "^8.0",
     "ext-mbstring": "*",
     "laminas/laminas-diactoros": "^2.8",
-    "laminas/laminas-httphandlerrunner": "^2.1",
     "league/container": "^4.2",
     "league/event": "^3.0",
     "league/route": "^5.1",

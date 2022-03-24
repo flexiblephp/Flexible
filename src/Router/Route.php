@@ -10,14 +10,9 @@ use Psr\Http\Server\MiddlewareInterface;
 
 class Route implements RouteInterface
 {
+    use Middlewareable;
+
     public function __construct(private LeagueRoute $route)
     {
-    }
-
-    public function middleware(MiddlewareInterface $middleware): self
-    {
-        $this->route->middleware($middleware);
-
-        return $this;
     }
 }

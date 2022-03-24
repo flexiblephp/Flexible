@@ -10,9 +10,9 @@ use Flexible\Event\EventDispatcher;
 use Flexible\Event\FlexibleHasTerminated;
 use Flexible\Http\ResponseFactory;
 use Flexible\Http\ResponseFactoryInterface;
+use Flexible\Http\SapiEmitter;
 use Flexible\Router\Router;
 use Flexible\Router\RouterInterface;
-use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,6 +20,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class App implements RequestHandlerInterface
 {
+    public const VERSION = 'dev';
+
     private function __construct(
         private ContainerInterface $container,
         private RouterInterface $router,
@@ -64,7 +66,11 @@ class App implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $response = $this->router->handle($request);
+        // try {
+            $response = $this->router->handle($request);
+        // } catch (\Exception $e) {
+        //     die('error' . $e->getMessage() . get_class($e));
+        // }
 
         /**
          * This is to be in compliance with RFC 2616, Section 9.
