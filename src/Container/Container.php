@@ -47,36 +47,21 @@ class Container implements ContainerInterface
         return $this->container->has($id);
     }
 
-    public function bind(string $abstraction, string $implementation): void
+    public function bind(string $abstraction, string $implementation, array $arguments = []): void
     {
         $this->container->add($abstraction, $implementation);
+
+        if (count($arguments) > 0) {
+            $this->container->extend($abstraction)->addArguments($arguments);
+        }
     }
 
-    public function singleton(string $abstraction, string $implementation): void
+    public function singleton(string $abstraction, string $implementation, array $arguments = []): void
     {
         $this->container->addShared($abstraction, $implementation);
-    }
 
-    public function addServiceProvider(string $serviceProvider): void
-    {
-        // if () check if valid class
-        $sp = (new ($serviceProvider)());
-
-        $sp->container($this);
-
-//        if (!$sp instanceof ServiceProviderInterface::class) {
-//            throw new \Exception('error');
-//        }
-
-        $this->container->addServiceProvider(
-            $sp
-        );
-    }
-
-    public function bindings(array $bindings = []): void
-    {
-        foreach ($bindings as $abstraction => $implementation) {
-            $this->bind($abstraction, $implementation);
+        if (count($arguments) > 0) {
+            $this->container->extend($abstraction)->addArguments($arguments);
         }
     }
 }

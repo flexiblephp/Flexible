@@ -6,14 +6,12 @@ namespace Flexible;
 
 use Flexible\Container\Container;
 use Flexible\Container\ContainerInterface;
-use Flexible\Event\EventDispatcher;
-use Flexible\Event\FlexibleHasTerminated;
-use Flexible\Http\ResponseFactory;
-use Flexible\Http\ResponseFactoryInterface;
-use Flexible\Http\SapiEmitter;
-use Flexible\Router\Router;
 use Flexible\Router\RouterInterface;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -21,33 +19,20 @@ use Psr\Http\Server\RequestHandlerInterface;
 class App implements RequestHandlerInterface
 {
     public const VERSION = 'dev';
-    private ResponseFactoryInterface $responseFactory;
 
-    private function __construct(
-        private ContainerInterface $container,
-        private RouterInterface $router,
-       // ,
-        private EventDispatcherInterface $eventDispatcher
-    ) {
+    private ResponseFactoryInterface $responseFactory;
+    private RouterInterface $router;
+    private EventDispatcherInterface $eventDispatcher;
+
+    private function __construct(private ContainerInterface $container)
+    {
     }
 
-    public static function create(
-        ?ContainerInterface $container = null,
-        ?RouterInterface $router = null,
-        //?ResponseFactoryInterface $responseFactory = null,
-        ?EventDispatcherInterface $eventDispatcher = null
-    ): self {
+    public static function create(?ContainerInterface $container = null): self
+    {
         $container = $container ?? new Container();
-        $router = $router ?? new Router($container);
-        //$responseFactory = $responseFactory ?? new ResponseFactory();
-        $eventDispatcher = $eventDispatcher ?? new EventDispatcher();
 
-        return new self(
-            $container,
-            $router,
-            //$responseFactory,
-            $eventDispatcher
-        );
+        return new self($container);
     }
 
     public function container(): ContainerInterface
@@ -55,28 +40,40 @@ class App implements RequestHandlerInterface
         return $this->container;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function eventDispatcher(): EventDispatcherInterface
     {
-        return $this->eventDispatcher;
+        return $this->eventDispatcher ?? $this->container->get(EventDispatcherInterface::class);
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function responseFactory(): ResponseFactoryInterface
+    {
+        return $this->responseFactory ?? $this->container->get(ResponseFactoryInterface::class);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function router(): RouterInterface
     {
-        return $this->router;
+        return $this->router ?? $this->container->get(RouterInterface::class);
     }
 
-    public function responseFactory(): \Psr\Http\Message\ResponseFactoryInterface
-    {
-        return $this->responseFactory ?? $this->container->get(\Psr\Http\Message\ResponseFactoryInterface::class);
-    }
-
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // try {
-            $response = $this->router->handle($request);
-        // } catch (\Exception $e) {
-        //     die('error' . $e->getMessage() . get_class($e));
-        // }
+        $response = $this->router()->handle($request);
 
         /**
          * This is to be in compliance with RFC 2616, Section 9.
@@ -95,10 +92,19 @@ class App implements RequestHandlerInterface
         return $response;
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function dispatch(ResponseInterface $response): void
     {
         (new SapiEmitter())->emit($response);
 
-        $this->eventDispatcher->dispatch(new FlexibleHasTerminated());
+        // TODO put events in the request flow $this->eventDispatcher()->dispatch(new FlexibleHasTerminated());
+    }
+
+    public function version(): string
+    {
+        return self::VERSION;
     }
 }
